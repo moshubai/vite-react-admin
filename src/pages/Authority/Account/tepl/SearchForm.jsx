@@ -31,15 +31,16 @@ const SearchForm = (props) => {
   };
   return (
     <SearchFormView onFinish={onFinish} form={form}>
-      <Form.Item label="手机号" name="salesItemCode">
+      <Form.Item label="用户名" name="userName">
+        <Input placeholder="请输入用户名" allowClear />
+      </Form.Item>
+      <Form.Item label="手机号" name="mobile">
         <Input placeholder="请输入手机号" allowClear />
       </Form.Item>
-      <Form.Item label="编号" name="itemNameCn">
-        <Input placeholder="请输入编号" allowClear />
-      </Form.Item>
-      <Form.Item label="角色名称" name="itemNameCn">
+
+      {/* <Form.Item label="角色名称" name="itemNameCn">
         <Input placeholder="请输入姓名" allowClear />
-      </Form.Item>
+      </Form.Item> */}
 
       <Button type="primary" htmlType="submit">
         查询

@@ -32,7 +32,7 @@ function TableView(props, ref) {
     pageIndex,
     defaultPageSize = 20,
   } = props;
-
+  console.log('props',props);
   const {
     header,
     message,

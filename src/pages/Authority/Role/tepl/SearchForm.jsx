@@ -1,29 +1,14 @@
 import SearchFormView from '@/components/search-view/index.jsx';
 import { Button, Form, Input } from 'antd';
-import moment from 'moment';
 import 'moment/locale/zh-cn';
 import React, { memo } from 'react';
 
 const SearchForm = (props) => {
-  const { childType } = props;
   const [form] = Form.useForm();
 
   //   查询
   const onFinish = (value) => {
-    let params = {
-      ...value,
-    };
-    if (value.timeArr) {
-      const { timeArr } = value;
-      params.confirmTimeStart = moment(timeArr[0]).format('YYYY-MM-DD HH:mm:ss');
-      params.confirmTimeEnd = moment(timeArr[1]).format('YYYY-MM-DD HH:mm:ss');
-      delete params.timeArr;
-    } else {
-      params.confirmTimeStart = undefined;
-      params.confirmTimeEnd = undefined;
-    }
-    console.log('value', value); //log-xu
-    props.onSearchFn(params);
+    props.onSearchFn(value);
   };
   const onResetFn = () => {
     form.resetFields();
@@ -31,10 +16,10 @@ const SearchForm = (props) => {
   };
   return (
     <SearchFormView onFinish={onFinish} form={form}>
-      <Form.Item label="角色代号" name="salesItemCode">
+      <Form.Item label="角色代号" name="code">
         <Input placeholder="请输入角色代号" allowClear />
       </Form.Item>
-      <Form.Item label="角色名称" name="itemNameCn">
+      <Form.Item label="角色名称" name="name">
         <Input placeholder="请输入角色名称" allowClear />
       </Form.Item>
 

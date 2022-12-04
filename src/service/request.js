@@ -1,13 +1,11 @@
+import { message } from 'antd';
 import axios from 'axios';
 
-import { getToken } from '../utils/cookie';
-
-const param = {
-  lang: 'zh_CN',
-};
+import { getToken, removeCookies } from '../utils/cookie';
+import history from '../utils/history';
 
 const service = axios.create({
-  baseURL: 'https://62e79d910e5d74566af825ad.mockapi.io/api/public/',
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 10000,
   // params: param,
   headers: {
@@ -20,7 +18,7 @@ const service = axios.create({
 
 service.interceptors.request.use(
   async (config) => {
-    const accessToken = `Bearer ${getToken()}` || '';
+    const accessToken = `${getToken()}` || '';
 
     config.headers = {
       Authorization: accessToken,
@@ -34,27 +32,37 @@ service.interceptors.request.use(
 
 service.interceptors.response.use(
   (response) => {
-    return response;
+    return response.data;
   },
   async (error) => {
-    const originalRequest = error.config;
-
-    if (error.response?.status === 403 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      const accessToken = await refreshAccessToken();
-
-      axios.defaults.headers.common['Authorization'] = 'Bearer ' + accessToken;
-
-      return service(originalRequest);
+    // const originalRequest = error.config;
+    console.log('errorerrorerror', error); //log-xu
+    const { response } = error;
+    if (response) {
+      const { status, data } = response;
+      switch (status) {
+        case 401:
+          message.error('未登陆或登陆已过期，请重新登陆.');
+          removeCookies('token');
+          history.push('/eorder-web/login');
+          break;
+        case 403:
+          message.error('对不起，您没有访问该资源的权限.');
+          removeCookies('token');
+          history.push('/eorder-web/login');
+          break;
+        case 404:
+          message.error('抱歉，页面不见了～');
+          break;
+        case 500:
+          message.error('抱歉，系统异常～');
+          break;
+        default:
+          message.error(data.msg || '抱歉，请求失败.');
+      }
     }
-
     return Promise.reject(error);
   },
 );
-
-const refreshAccessToken = async () => {
-  return '';
-};
 
 export default service;

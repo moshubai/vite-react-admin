@@ -1,34 +1,25 @@
 /**
- * 添加账户
+ * 添加权限
  * */
-// import moment from 'moment';
 import { UploadOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Modal, Radio, Select, Upload, message } from 'antd';
+import { Button, Form, Input, Modal, Radio, Upload, message } from 'antd';
 import 'moment/locale/zh-cn';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 
-// import { ngQueryInventory, ngEcQueryInventory } from "@/api/carriers-config.js";
-const { TextArea } = Input;
-const { Option } = Select;
+import { apiAddAuthEdit, apiAddAuthItem } from '../../../../api/Authority';
 
 const AddAccount = (props, ref) => {
   // const location = useLocation(); // 获取上一个页面传递进来的 state 参数  poskeyList
-  const { poskeyList } = props;
+  const { recordParams } = props;
   const [form] = Form.useForm();
   const [isRemarkModal, setIsPassModal] = useState(false);
-  const [storeVal, setStoreVal] = useState('0');
   const [loading, setLoading] = useState(false);
-  const [btnDis, setBtnDis] = useState(true);
-  const [btnStoreDis, setBtnStoreDis] = useState(false);
 
   const showModal = async () => {
-    await setStoreVal('0');
     await setIsPassModal(true);
 
-    if (poskeyList) {
-      form.setFieldsValue({ posKeys: poskeyList });
-      setBtnDis(false);
-      setBtnStoreDis(false);
+    if (recordParams && recordParams.flag === 'edit') {
+      form.setFieldsValue(recordParams);
     }
   };
 
@@ -39,37 +30,45 @@ const AddAccount = (props, ref) => {
       props.closeModal(flag);
     }, 300);
   };
-  // const addUpdataFn = ({ posKeys, storeIds }) => {
-  //   let params = {
-  //     posKeys: posKeys,
-  //     storeIds: storeIds,
-  //     batchNo: props?.batchNo,
-  //   };
-  //   setLoading(true);
-  //   const fn = isECModules ? ngEcQueryInventory : ngQueryInventory;
-  //   fn(params)
-  //     .then((res) => {
-  //       console.log(res);
-  //       if (+res.code === 200) {
-  //         message.success(res.data);
-  //         endFinally(true);
-  //       } else {
-  //         message.error(res.message);
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       console.log("err", err); //log-xu
-  //     })
-  //     .finally(() => {
-  //       setLoading(false);
-  //     });
-  // };
+  const addUpdataFn = (item) => {
+    console.log('item', item); //log-xu
+    setLoading(true);
+    let params = {
+      ...item,
+    };
+    let fn = apiAddAuthItem;
+    if (recordParams && recordParams.flag === 'edit') {
+      params.id = recordParams.id;
+      params.parentId = recordParams.parentId ? recordParams.parentId : '0';
+      fn = apiAddAuthEdit;
+    }
+    if (recordParams && recordParams.flag === 'next') {
+      params.parentId = recordParams.id;
+      fn = apiAddAuthItem;
+    }
+    fn(params)
+      .then((res) => {
+        console.log('res', res); //log-xu
+        if (+res.code === 200) {
+          message.success('成功');
+          endFinally(true);
+        } else {
+          message.error(res.message);
+        }
+      })
+      .catch((err) => {
+        console.log('err', err); //log-xu
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   const handleOkFn = async () => {
     try {
       const row = await form.validateFields();
       console.log('validateFields success', row);
-      // addUpdataFn(row);
+      addUpdataFn(row);
     } catch (errInfo) {
       console.log('Validate Failed:', errInfo);
     }
@@ -85,15 +84,6 @@ const AddAccount = (props, ref) => {
     },
   }));
 
-  const onChange = ({ target: { value } }) => {
-    setStoreVal(value);
-    console.log('valuevaluevalue', value); //log-xu
-    // if (+value === 1) {
-    //   setBtnStoreDis(true);
-    // } else {
-    // setBtnStoreDis(false);
-    // }
-  };
   const layout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 16 },
@@ -119,7 +109,13 @@ const AddAccount = (props, ref) => {
 
   return (
     <Modal
-      title="新增账户"
+      title={
+        recordParams && recordParams.flag === 'edit'
+          ? '编辑权限'
+          : recordParams && recordParams.flag === 'look'
+          ? '查看权限'
+          : '新增权限'
+      }
       open={isRemarkModal}
       onCancel={handleCancelFn}
       destroyOnClose={true}
@@ -142,15 +138,18 @@ const AddAccount = (props, ref) => {
         <Form.Item name="code" label="code" rules={[{ required: true, message: '请输入code' }]}>
           <Input placeholder="请输入code" />
         </Form.Item>
-        <Form.Item name="url" label="route" rules={[{ required: true, message: '请输入route' }]}>
-          <Input placeholder="请输入route" />
-        </Form.Item>
 
+        <Form.Item name="route" label="路由" rules={[{ required: true, message: '请输入路由' }]}>
+          <Input placeholder="请输入路由" />
+        </Form.Item>
         <Form.Item name="icon" label="icon">
-          {/* <Input.TextArea placeholder="请输入" /> */}
           <Upload {...uploadProps}>
             <Button icon={<UploadOutlined />}>上传文件</Button>
           </Upload>
+        </Form.Item>
+        <Form.Item name="url" label="url">
+          {/* <Input placeholder="请输入route" /> */}
+          <Input.TextArea placeholder="请输入" />
         </Form.Item>
 
         <Form.Item label="类型" name={'type'}>

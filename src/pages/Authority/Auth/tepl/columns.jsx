@@ -1,4 +1,4 @@
-import { Button, Space } from 'antd';
+import { Button, Popconfirm, Space } from 'antd';
 import React from 'react';
 
 export const getOperationType = (type) => {
@@ -14,10 +14,10 @@ export const getColumns = (callback) => {
   return [
     {
       title: '权限名称',
-      dataIndex: 'employeeId',
-      key: 'employeeId',
+      dataIndex: 'name',
+      key: 'name',
       render: (text, record, index) => {
-        return <>{record.employeeId}</>;
+        return <>{record.name}</>;
       },
     },
     {
@@ -34,18 +34,20 @@ export const getColumns = (callback) => {
       render: (text, record, index) => {
         return (
           <Space size="small">
-            <Button type="text" onClick={() => callback('detail', record)}>
+            <Button type="link" onClick={() => callback('look', record)}>
               查看
             </Button>
-            <Button type="text" onClick={() => callback('detail', record)}>
+            <Button type="link" onClick={() => callback('edit', record)}>
               编辑
             </Button>
-            <Button type="text" onClick={() => callback('detail', record)}>
+            <Button type="link" onClick={() => callback('next', record)}>
               添加下级
             </Button>
-            <Button type="text" danger onClick={() => callback('detail', record)}>
-              删除
-            </Button>
+            <Popconfirm placement="topRight" title={'是否确认删除该权限？'} onConfirm={() => callback('del', record)}>
+              <Button type="link" danger>
+                删除
+              </Button>
+            </Popconfirm>
           </Space>
         );
       },

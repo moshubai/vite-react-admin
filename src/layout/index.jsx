@@ -11,6 +11,7 @@ export const Login = lazy(() => import('../pages/Login'));
 
 const styleContent = css({
   padding: 20,
+  overflow: 'auto',
 });
 
 const PageLayout = () => {
@@ -20,7 +21,7 @@ const PageLayout = () => {
       <Layout className={style.warpContent}>
         <Layout className={style.pagelayout}>
           <Sider />
-          <Layout style={{ marginLeft: '15px', background: '#f0f2f5' }}>
+          <Layout style={{ marginLeft: '15px', background: '#f0f2f5', paddingBottom: 15 }}>
             <Layout.Content css={styleContent}>
               <Outlet />
             </Layout.Content>

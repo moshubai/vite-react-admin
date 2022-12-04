@@ -9,6 +9,7 @@ import {
   Exception404,
   Exception500,
   OrderList,
+  OrderDetails,
   RoleList,
 } from './route';
 
@@ -26,6 +27,14 @@ export const routes = [
     element: (
       <Suspense fallback={<PageLoading />}>
         <OrderList />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/order/list/details',
+    element: (
+      <Suspense fallback={<PageLoading />}>
+        <OrderDetails />
       </Suspense>
     ),
   },

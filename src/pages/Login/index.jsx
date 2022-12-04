@@ -1,8 +1,10 @@
 import { UnlockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Divider, Form, Input, Layout, message, notification } from 'antd';
-import React, { useEffect, useState } from 'react';
+import { Button, Divider, Form, Input, Layout, message } from 'antd';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { apiLogin } from '../../api/login';
+import { setCookies } from '../../utils/cookie';
 // import '@/style/view-style/login.scss'
 import style from './index.module.less';
 
@@ -11,33 +13,30 @@ const Login = (props) => {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = (values) => {
-    // 这里可以做权限校验 模拟接口返回用户权限标识
-    switch (values.username) {
-      case 'admin':
-        values.auth = 0;
-        break;
-      default:
-        values.auth = 1;
-    }
-
-    localStorage.setItem('user', JSON.stringify(values));
     setLoading(true);
-    setTimeout(() => {
-      message.success('登录成功!');
-      navigate('/');
-    }, 2000);
-  };
+    apiLogin(values).then((res) => {
+      console.log('====================================');
+      console.log(res);
+      const { code, data } = res;
+      if (+code === 200) {
+        setCookies('token', data.accessToken);
+        setTimeout(() => {
+          message.success('登录成功!');
+          setLoading(false);
+          // notification.open({
+          //   message: '欢迎',
+          //   duration: 2,
+          //   description: '欢迎使用后台管理平台',
+          // });
 
-  useEffect(() => {
-    notification.open({
-      message: '欢迎使用后台管理平台',
-      duration: null,
-      description: '账号 admin(管理员) 其他(游客) 密码随意',
+          navigate('/home');
+        }, 0);
+      } else {
+        message.error(res.message);
+        setLoading(false);
+      }
     });
-    return () => {
-      notification.destroy();
-    };
-  }, []);
+  };
 
   return (
     <Layout className={style['login']}>
@@ -46,7 +45,7 @@ const Login = (props) => {
           <h3>后台管理系统</h3>
           <Divider />
           <Form onFinish={handleSubmit}>
-            <Form.Item name="username" rules={[{ required: true, message: '请输入用户名!' }]}>
+            <Form.Item name="userName" rules={[{ required: true, message: '请输入用户名!' }]}>
               <Input prefix={<UserOutlined style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="用户名" />
             </Form.Item>
             <Form.Item name="password" rules={[{ required: true, message: '请输入密码!' }]}>

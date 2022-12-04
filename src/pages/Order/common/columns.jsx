@@ -12,66 +12,121 @@ export const getApprovalStatus = (type) => {
 export const getColumns = (callback) => {
   return [
     {
-      title: 'BP/GP编号',
-      dataIndex: 'salesItemCode',
-      key: 'salesItemCode',
+      title: '编号',
+      dataIndex: 'number',
+      key: 'number',
+      width:120,
       render: (text, record, index) => {
-        return <>{record.salesItemCode}</>
+        return <>{record.number}</>
       },
     },
     {
-      title: 'BP/GP名称',
-      dataIndex: 'gpNameEn',
-      key: 'gpNameEn',
-      render: (text, { nameCn, nameEn }, index) => {
-        return (
-          <div style={{ minWidth: 120 }}>
-            中文：{nameCn}
-            <br />
-            英文：{nameEn}
-          </div>
-        )
+      title: '创建时间',
+      dataIndex: 'createDate',
+      key: 'createDate',
+      width:120,
+      render: (text, record, index) => {
+        return <>{record.createDate}</>
       },
     },
     {
-      title: '数据类型',
-      dataIndex: 'type',
-      key: 'type',
+      title: '状态',
+      dataIndex: 'status',
+      key: 'status',
+      width:120,
       render: (text, record, index) => {
-        return <div style={{ minWidth: 60 }}>{+record.type === 1 ? 'BP' : 'GP'}</div>
+        return <>{record.status}</>
       },
     },
     {
-      title: '操作类型',
-      dataIndex: 'approvalStatus',
-      key: 'approvalStatus',
+      title: '订单类型',
+      dataIndex: 'orderType',
+      key: 'orderType',
+      width:120,
       render: (text, record, index) => {
-        return <div style={{ minWidth: 60 }}>{getApprovalStatus(+record.approvalStatus)}</div>
+        return <>{record.orderType}</>
       },
     },
     {
-      title: '审核时间',
-      dataIndex: 'confirmTime',
-      key: 'confirmTime',
+      title: '经销商名称',
+      dataIndex: 'memberName',
+      key: 'memberName',
+      width:120,
       render: (text, record, index) => {
-        return <div style={{ minWidth: 150 }}>{record.confirmTime}</div>
+        return <>{record.memberName}</>
       },
     },
     {
-      title: '审核人',
-      dataIndex: 'confirmUser',
-      key: 'confirmUser',
+      title: '经销商类型',
+      dataIndex: 'memberType',
+      key: 'memberType',
+      width:120,
       render: (text, record, index) => {
-        return <div style={{ minWidth: 80 }}>{record.confirmUser}</div>
+        return <>{record.memberType}</>
       },
     },
 
     {
-      title: '驳回原因',
-      dataIndex: 'approvalReason',
-      key: 'approvalReason',
+      title: '经销商地址',
+      dataIndex: 'memberAddress',
+      key: 'memberAddress',
+      width:120,
       render: (text, record, index) => {
-        return <div style={{ minWidth: 200 }}>{record.approvalReason}</div>
+        return <>{record.memberAddress}</>
+      },
+    },
+    {
+      title: '收货地址',
+      dataIndex: 'shipAddress',
+      key: 'shipAddress',
+      width:120,
+      render: (text, record, index) => {
+        return <>{record.shipAddress}</>
+      },
+    },
+    {
+      title: '联系人',
+      dataIndex: 'memberLinkman',
+      key: 'memberLinkman',
+      width:120,
+      render: (text, record, index) => {
+        return <>{record.memberLinkman}</>
+      },
+    },
+    {
+      title: '联系人电话',
+      dataIndex: 'memberLinkmanMobile',
+      key: 'memberLinkmanMobile',
+      width:120,
+      render: (text, record, index) => {
+        return <>{record.memberLinkmanMobile}</>
+      },
+    },
+    {
+      title: '订购总数量',
+      dataIndex: 'quantity',
+      key: 'quantity',
+      width:120,
+      render: (text, record, index) => {
+        return <>{record.quantity}</>
+      },
+    },
+    {
+      title: '运费',
+      dataIndex: 'freightPrice',
+      key: 'freightPrice',
+      width:120,
+      render: (text, record, index) => {
+        return <>{record.freightPrice}</>
+      },
+    },
+    {
+      title: '总金额',
+      dataIndex: 'lineAmount',
+      key: 'lineAmount',
+      width:120,
+      render: (text, record, index) => {
+        return <>{record.lineAmount}</>
       },
     },
     {
@@ -82,11 +137,11 @@ export const getColumns = (callback) => {
       render: (text, record, index) => {
         return (
           <Space size="small">
-            <KAuthHoc code="pc_menu_logsearch_godetail_button">
+            {/* <KAuthHoc code="pc_menu_logsearch_godetail_button"> */}
               <Button type="text" onClick={() => callback('detail', record)}>
                 查看详情
               </Button>
-            </KAuthHoc>
+            {/* </KAuthHoc> */}
           </Space>
         )
       },

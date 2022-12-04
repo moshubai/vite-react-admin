@@ -1,31 +1,24 @@
 /**
  * 添加备注
  * */
-import { Button, Form, Input, Modal, Radio, Select } from 'antd';
+import { Button, Form, Input, Modal, Radio, message } from 'antd';
 import { forwardRef, useImperativeHandle, useState } from 'react';
 
-// import { ngQueryInventory, ngEcQueryInventory } from "@/api/carriers-config.js";
-const { TextArea } = Input;
-const { Option } = Select;
+import { apiAddRole, apiPutRole } from '../../../../api/Authority';
 
 const AddRole = (props, ref) => {
   // const location = useLocation(); // 获取上一个页面传递进来的 state 参数  poskeyList
-  const { poskeyList } = props;
+  const { recordParams } = props;
   const [form] = Form.useForm();
   const [isRemarkModal, setIsPassModal] = useState(false);
-  const [storeVal, setStoreVal] = useState('0');
   const [loading, setLoading] = useState(false);
-  const [btnDis, setBtnDis] = useState(true);
-  const [btnStoreDis, setBtnStoreDis] = useState(false);
 
   const showModal = async () => {
-    await setStoreVal('0');
     await setIsPassModal(true);
-
-    if (poskeyList) {
-      form.setFieldsValue({ posKeys: poskeyList });
-      setBtnDis(false);
-      setBtnStoreDis(false);
+    if (recordParams) {
+      form.setFieldsValue(recordParams);
+    } else {
+      form.resetFields();
     }
   };
 
@@ -36,37 +29,39 @@ const AddRole = (props, ref) => {
       props.closeModal(flag);
     }, 300);
   };
-  // const addUpdataFn = ({ posKeys, storeIds }) => {
-  //   let params = {
-  //     posKeys: posKeys,
-  //     storeIds: storeIds,
-  //     batchNo: props?.batchNo,
-  //   };
-  //   setLoading(true);
-  //   const fn = isECModules ? ngEcQueryInventory : ngQueryInventory;
-  //   fn(params)
-  //     .then((res) => {
-  //       console.log(res);
-  //       if (+res.code === 200) {
-  //         message.success(res.data);
-  //         endFinally(true);
-  //       } else {
-  //         message.error(res.message);
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       console.log("err", err); //log-xu
-  //     })
-  //     .finally(() => {
-  //       setLoading(false);
-  //     });
-  // };
+  const addUpdataFn = (item) => {
+    let params = {
+      ...item,
+    };
+    let fn = apiAddRole;
+    if (recordParams && recordParams.flag === 'edit') {
+      fn = apiPutRole;
+      params.id = recordParams.id;
+    }
+    setLoading(true);
+    fn(params)
+      .then((res) => {
+        console.log(res);
+        if (+res.code === 200) {
+          message.success(res.data);
+          endFinally(true);
+        } else {
+          message.error(res.message);
+        }
+      })
+      .catch((err) => {
+        console.log('err', err); //log-xu
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   const handleOkFn = async () => {
     try {
       const row = await form.validateFields();
       console.log('validateFields success', row);
-      // addUpdataFn(row);
+      addUpdataFn(row);
     } catch (errInfo) {
       console.log('Validate Failed:', errInfo);
     }
@@ -82,15 +77,6 @@ const AddRole = (props, ref) => {
     },
   }));
 
-  const onChange = ({ target: { value } }) => {
-    setStoreVal(value);
-    console.log('valuevaluevalue', value); //log-xu
-    // if (+value === 1) {
-    //   setBtnStoreDis(true);
-    // } else {
-    // setBtnStoreDis(false);
-    // }
-  };
   const layout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 16 },
@@ -98,23 +84,37 @@ const AddRole = (props, ref) => {
 
   return (
     <Modal
-      title="新增角色"
+      title={
+        recordParams && recordParams.flag === 'edit'
+          ? '编辑角色'
+          : recordParams && recordParams.flag === 'look'
+          ? '查看'
+          : '新增角色'
+      }
       open={isRemarkModal}
       onCancel={handleCancelFn}
       destroyOnClose={true}
       maskClosable={false}
       width={600}
       centered={true}
-      footer={[
-        <Button key="submit" type="primary" className="ant-btn-medium" onClick={handleOkFn} loading={loading}>
-          确定
-        </Button>,
-        <Button key="back" className="ant-btn-medium" onClick={handleCancelFn}>
-          取消
-        </Button>,
-      ]}
+      footer={
+        recordParams && recordParams.flag === 'look'
+          ? [
+              <Button key="back" className="ant-btn-medium" onClick={handleCancelFn}>
+                取消
+              </Button>,
+            ]
+          : [
+              <Button key="back" className="ant-btn-medium" onClick={handleCancelFn}>
+                取消
+              </Button>,
+              <Button key="submit" type="primary" className="ant-btn-medium" onClick={handleOkFn} loading={loading}>
+                确定
+              </Button>,
+            ]
+      }
     >
-      <Form {...layout} form={form} autoComplete="off">
+      <Form {...layout} form={form} autoComplete="off" disabled={recordParams && recordParams.flag === 'look'}>
         <Form.Item name="code" label="code" rules={[{ required: true, message: '请输入code' }]}>
           <Input placeholder="请输入code" />
         </Form.Item>

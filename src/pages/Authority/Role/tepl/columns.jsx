@@ -1,4 +1,4 @@
-import { Button, Popconfirm, Space } from 'antd';
+import { Button, Space } from 'antd';
 import React from 'react';
 
 // export const getOperationType = (type) => {
@@ -37,18 +37,18 @@ export const getColumns = (callback) => {
     },
     {
       title: '创建人',
-      dataIndex: 'creator',
+      dataIndex: 'creatorName',
       key: 'creator',
-    },
-    {
-      title: '修改时间',
-      dataIndex: 'modifier',
-      key: 'modifier',
     },
     {
       title: '修改人',
-      dataIndex: 'creator',
-      key: 'creator',
+      dataIndex: 'modifierName',
+      key: 'modifier',
+    },
+    {
+      title: '修改时间',
+      dataIndex: 'updatedTime',
+      key: 'updatedTime',
     },
 
     {
@@ -59,25 +59,26 @@ export const getColumns = (callback) => {
       render: (text, record, index) => {
         return (
           <Space size="small">
-            <Button type="text" onClick={() => callback('power', record)}>
+            <Button type="link" onClick={() => callback('look', record)}>
+              查看
+            </Button>
+            <Button type="link" onClick={() => callback('power', record)}>
               设置权限
             </Button>
-            <Button type="text" onClick={() => callback('edit', record)}>
+            <Button type="link" onClick={() => callback('edit', record)}>
               编辑
             </Button>
-            <Popconfirm
+            {/* <Popconfirm
               placement="topRight"
               title={'确定要删除吗？'}
               onConfirm={() => callback('del', record)}
               okText="确定"
               cancelText="取消"
             >
-              <Button type="text">删除</Button>
-            </Popconfirm>
-
-            <Button type="text" onClick={() => callback('look', record)}>
-              查看
-            </Button>
+              <Button type="link" danger>
+                删除
+              </Button>
+            </Popconfirm> */}
           </Space>
         );
       },

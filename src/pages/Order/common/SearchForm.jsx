@@ -1,77 +1,118 @@
-import SearchFormView from '@/components/search-view/index.jsx';
-import { Button, DatePicker, Form, Input, Select } from 'antd';
-import locale from 'antd/es/date-picker/locale/zh_CN';
-import moment from 'moment';
-import 'moment/locale/zh-cn';
-import React, { memo } from 'react';
+import SearchFormView from '@/components/search-view/index.jsx'
+import { Button, DatePicker, Form, Input, Select } from 'antd'
+import moment from 'moment'
+import React, { memo } from 'react'
 
+const stateOptions = [
+  {label:"待付款",value:10},
+  {label:"待仓库发货",value:11},
+  {label:"待买家收货",value:12},
+  {label:"待买家发货",value:13},
+  {label:"待仓库收货",value:14},
+  {label:"交易完成",value:15},
+  {label:"已取消",value:20},
+  {label:"退款中",value:21},
+  {label:"退款成功",value:22},
+  {label:"退货中",value:23},
+  {label:"退货成功",value:24},
+]
+const typeOptions = [
+  {label:"全部",value:1},
+  {label:"常规订单",value:2},
+  {label:"预订单",value:3},
+]
 const SearchForm = (props) => {
-  const { childType } = props;
-  const [form] = Form.useForm();
+  const { onSearchFn } = props
+  const [form] = Form.useForm()
 
-  //   查询
+  const formContent = [
+    {
+      label:"订单编号",
+      name: "id",
+      value: (
+        <Input allowClear/>
+      )
+    },
+    {
+      label:"创建时间",
+      name: "time",
+      value: (
+        <DatePicker.RangePicker 
+          showTime
+          placeholder={[]}
+          format={'YYYY-MM-DD'}
+        />
+      )
+    },
+    {
+      label:"订单状态",
+      name: "status",
+      value: (
+        <Select 
+          options={stateOptions}
+          placeholder='全部'
+          style={{width:111}}
+        />
+      )
+    },
+    {
+      label:"经销商代码",
+      name: "memberCode",
+      value: (
+        <Input allowClear/>
+      )
+    },
+    {
+      label:"订单类型",
+      name: "orderType",
+      value: (
+        <Select 
+          options={typeOptions}
+          placeholder='全部'
+          style={{width:111}}
+        />
+      )
+    },
+    {
+      label:"经销商名称",
+      name: "memberName",
+      value: (
+        <Input allowClear/>
+      )
+    },
+  ]
+    //   查询
   const onFinish = (value) => {
     let params = {
       ...value,
-    };
-    if (value.timeArr) {
-      const { timeArr } = value;
-      params.confirmTimeStart = moment(timeArr[0]).format('YYYY-MM-DD HH:mm:ss');
-      params.confirmTimeEnd = moment(timeArr[1]).format('YYYY-MM-DD HH:mm:ss');
-      delete params.timeArr;
-    } else {
-      params.confirmTimeStart = undefined;
-      params.confirmTimeEnd = undefined;
     }
-    console.log('value', value); //log-xu
-    props.onSearchFn(params);
-  };
+    if(value.time){
+      params.startCreateDate = value.time[0].format('YYYY-MM-DD')
+      params.endCreateDate = value.time[1].format('YYYY-MM-DD')
+    }
+    delete params.time
+    let obj = {
+      params
+    }
+    onSearchFn(obj)
+  }
   const onResetFn = () => {
-    form.resetFields();
-    props.onSearchFn(null);
-  };
+    form.resetFields()
+    onSearchFn()
+  }
   return (
     <SearchFormView onFinish={onFinish} form={form}>
-      <Form.Item label="BP编号" name="salesItemCode">
-        <Input placeholder="请输入BP编号" allowClear />
-      </Form.Item>
-      <Form.Item label="BP中文名称" name="itemNameCn">
-        <Input placeholder="请输入BP中文名称" allowClear />
-      </Form.Item>
-      <Form.Item label="GP编号" name="gpCode">
-        <Input placeholder="请输入GP编号" allowClear />
-      </Form.Item>
-      <Form.Item label="GP中文名称" name="gpNameCn">
-        <Input placeholder="请输入GP名称" allowClear />
-      </Form.Item>
-      <Form.Item label="数据类型" name="type">
-        <Select placeholder="请选择" allowClear>
-          <Select.Option value="null">全部</Select.Option>
-          <Select.Option value="1">BP</Select.Option>
-          <Select.Option value="2">GP</Select.Option>
-        </Select>
-      </Form.Item>
-      <Form.Item label="操作类型" name="searchType">
-        <Select placeholder="请选择" allowClear>
-          <Select.Option value="2">通过</Select.Option>
-          <Select.Option value="4">批量通过</Select.Option>
-          <Select.Option value="3">驳回</Select.Option>
-          <Select.Option value="5">批量驳回</Select.Option>
-        </Select>
-      </Form.Item>
-      <Form.Item label="审核时间" name="timeArr">
-        <DatePicker.RangePicker
-          locale={locale}
-          separator={'至'}
-          placeholder={['开始日期', '结束日期']}
-          showTime
-          format="YYYY-MM-DD HH:mm:ss"
-          style={{ width: 400 }}
-        />
-      </Form.Item>
-      <Form.Item label="审核人" name="confirmUser">
-        <Input placeholder="请输入审核人账号" allowClear />
-      </Form.Item>
+      {
+        formContent.map((item,index)=>[
+          <Form.Item
+            key={index}
+            name={item.name}
+            label={item.label}
+          >
+            {item.value}
+          </Form.Item>
+        ])
+      }
       <Button type="primary" htmlType="submit" className="ant-btn-medium">
         查询
       </Button>
@@ -79,6 +120,6 @@ const SearchForm = (props) => {
         重置
       </Button>
     </SearchFormView>
-  );
-};
-export default memo(SearchForm);
+  )
+}
+export default memo(SearchForm)

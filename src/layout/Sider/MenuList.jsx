@@ -1,11 +1,11 @@
-import { DashboardOutlined, NotificationOutlined, UserOutlined } from '@ant-design/icons';
+import { DashboardOutlined, NotificationOutlined, OrderedListOutlined } from '@ant-design/icons';
 
 export const menuItems = [
   { key: '/', label: '首页', icon: <DashboardOutlined /> },
   {
     key: '/order',
     label: '订单列表',
-    icon: <UserOutlined />,
+    icon: <OrderedListOutlined />,
     children: [
       {
         label: '订单列表',

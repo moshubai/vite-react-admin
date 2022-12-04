@@ -1,4 +1,4 @@
-import { Button, Space } from 'antd';
+import { Button, Popconfirm, Space } from 'antd';
 import React from 'react';
 
 export const getOperationType = (type) => {
@@ -17,11 +17,11 @@ export const getColumns = (callback) => {
       dataIndex: 'employeeId',
       key: 'employeeId',
       render: (text, record, index) => {
-        return <>{record.employeeId}</>;
+        return <>{index + 1}</>;
       },
     },
     {
-      title: '姓名',
+      title: '用户名',
       dataIndex: 'userName',
       key: 'userName',
     },
@@ -45,15 +45,15 @@ export const getColumns = (callback) => {
       dataIndex: 'confirmUser',
       key: 'confirmUser',
     },
-    {
-      title: '公司',
-      dataIndex: 'address',
-      key: 'address',
-    },
+    // {
+    //   title: '公司',
+    //   dataIndex: 'address',
+    //   key: 'address',
+    // },
     {
       title: '修改人',
-      dataIndex: 'modifier',
-      key: 'modifier',
+      dataIndex: 'modifierName',
+      key: 'modifierName',
     },
     {
       title: '修改时间',
@@ -69,15 +69,20 @@ export const getColumns = (callback) => {
       render: (text, record, index) => {
         return (
           <Space size="small">
-            <Button type="text" onClick={() => callback('detail', record)}>
+            <Button type="link" onClick={() => callback('look', record)}>
               查看
             </Button>
-            <Button type="text" onClick={() => callback('detail', record)}>
+            <Button type="link" onClick={() => callback('edit', record)}>
               编辑
             </Button>
-            <Button type="text" danger onClick={() => callback('detail', record)}>
-              删除
+            <Button type="link" onClick={() => callback('role', record)}>
+              设置角色
             </Button>
+            <Popconfirm placement="topRight" title={'是否确认删除该账户？'} onConfirm={() => callback('del', record)}>
+              <Button type="link" danger>
+                删除
+              </Button>
+            </Popconfirm>
           </Space>
         );
       },

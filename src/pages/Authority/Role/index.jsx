@@ -2,6 +2,8 @@ import TableView from '@/components/table-view/index.jsx';
 import React, { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { apiGetRoleList } from '../../../api/Authority';
+import { useQueryForm } from '../../../hooks/useUtil';
 import AddPower from './tepl/AddPower.jsx';
 import AddRole from './tepl/AddRole.jsx';
 import SearchForm from './tepl/SearchForm.jsx';
@@ -14,20 +16,38 @@ const SyncNgInvent = () => {
   const addPowerModalRef = useRef();
   const navigate = useNavigate();
 
-  const [addLoading, setAddLoading] = useState(false);
   const [addModalFlag, setAddModalFlag] = useState(false);
   const [addModalPower, setAddModalPower] = useState(false);
+  const [recordParams, setRecordParams] = useState({});
   // 分页
   const [formParams, setPostParams] = useState({
     pageNo: 1,
     pageSize: 20,
+    code: '',
+    name: '',
   });
 
-  // const { data, isFetching, refetch, status } = useQueryForm(
-  //   `data-log-audit${formParams.pageNo + formParams.pageSize}`,
-  //   [formParams],
-  //   postInfoLog
-  // );
+  const { data, isFetching, isLoading, refetch, isError, error } = useQueryForm(
+    `authority-role-${formParams.pageNo + formParams.pageSize}`,
+    [formParams],
+    apiGetRoleList,
+  );
+
+  const dataSource = useMemo(() => {
+    if (isError) {
+      console.log(error);
+      return [];
+    } else if (isLoading) {
+      return [];
+    }
+    return data.data;
+  }, [data, error, isError, isLoading]);
+
+  const isRefetch = async () => {
+    setTimeout(() => {
+      refetch();
+    }, 0);
+  };
   const pageHandlechange = (page) => {
     setPostParams({
       ...formParams,
@@ -41,22 +61,28 @@ const SyncNgInvent = () => {
       setPostParams({
         pageNo: 1,
         pageSize: 20,
+        code: '',
+        name: '',
       });
     } else {
       let ojb = {
+        code: '',
+        name: '',
         ...formParams,
         ...params,
         pageNo: 1,
       };
+      console.log('ojbojbojb', ojb); //log-xu
       setPostParams(ojb);
     }
-    setTimeout(() => {
-      // refetch();
-    }, 0);
+    isRefetch();
   };
 
   const tableCallback = async (type, record) => {
-    const { id, operationType } = record;
+    const newRecord = JSON.parse(JSON.stringify(record));
+    console.log('newRecord', newRecord); //log-xu
+    newRecord.flag = type;
+    setRecordParams(newRecord);
     switch (type) {
       case 'power':
         setAddModalPower(true);
@@ -65,11 +91,19 @@ const SyncNgInvent = () => {
         }, 0);
         break;
       case 'edit':
+        setAddModalFlag(true);
+        setTimeout(() => {
+          addRoleModalRef.current.open();
+        });
         break;
       case 'del':
         break;
 
       default:
+        setAddModalFlag(true);
+        setTimeout(() => {
+          addRoleModalRef.current.open();
+        });
         break;
     }
     // if (record.type === 1) {
@@ -101,6 +135,7 @@ const SyncNgInvent = () => {
    * @params {type}
    * */
   const addHandleButton = (type) => {
+    setRecordParams(null);
     setAddModalFlag(true);
     setTimeout(() => {
       addRoleModalRef.current.open();
@@ -108,41 +143,32 @@ const SyncNgInvent = () => {
   };
 
   const closeModal = (flag) => {
-    // setFailModal(false);
-    // setAsyncModal(false);
-    // tableRef.current.clearSelection();
-    // flag && isRefetch();
+    setAddModalFlag(false);
+    setAddModalPower(false);
+    flag && isRefetch();
   };
-
-  const dataSource = [
-    {
-      code: 'guanliyuan',
-      name: '超级管理员',
-      createdTime: '2020-11-25 00:00:00',
-    },
-  ];
 
   return (
     <>
       {/* <UserList /> */}
       <SearchForm onSearchFn={onSearchFn} />
-      <TableButton addHandleButton={addHandleButton} addLoading={addLoading} />
+      <TableButton addHandleButton={addHandleButton} />
       <TableView
         columnsFields={columns}
-        dataSource={dataSource}
-        total={0}
+        dataSource={dataSource?.list || []}
+        total={dataSource?.total || 0}
         ref={tableRef}
         rowKey="id"
         size={'small'}
         bordered={false}
-        // loading={isFetching}
+        loading={isFetching}
         pageHandlechange={pageHandlechange}
         pageIndex={formParams.pageNo}
         scrollX={1000}
       />
 
-      {addModalFlag && <AddRole ref={addRoleModalRef} closeModal={closeModal} />}
-      {addModalPower && <AddPower ref={addPowerModalRef} closeModal={closeModal} />}
+      {addModalFlag && <AddRole ref={addRoleModalRef} closeModal={closeModal} recordParams={recordParams} />}
+      {addModalPower && <AddPower ref={addPowerModalRef} closeModal={closeModal} recordParams={recordParams} />}
     </>
   );
 };

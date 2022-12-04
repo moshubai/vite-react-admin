@@ -17,7 +17,7 @@ const TableButton = (props) => {
         addHandleButton();
       }}
     >
-      新增账户
+      新增权限
     </Button>
   );
 };

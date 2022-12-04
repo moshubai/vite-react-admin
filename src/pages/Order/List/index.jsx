@@ -1,108 +1,141 @@
-import TableView from '@/components/table-view/index.jsx'
-import React, { useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { getColumns } from '../common/columns'
-import SearchForm from '../common/SearchForm.jsx'
-import TableButton from '../common/TableButton.jsx'
+import backOrderApi from '@/api/backOrder';
+import TableView from '@/components/table-view/index.jsx';
+import React, { useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
+import { useQueryForm } from '../../../hooks/useUtil';
+import SearchForm from '../common/SearchForm.jsx';
+import TableButton from '../common/TableButton.jsx';
+import { getColumns } from '../common/columns';
+
+const orderState = {
+  10: '待付款',
+  11: '待仓库发货',
+  12: '待买家收货',
+  13: '待买家发货',
+  14: '待仓库收货',
+  15: '交易完成',
+  20: '已取消',
+  21: '退款中',
+  22: '退款成功',
+  23: '退货中',
+  24: '退货成功',
+};
 const SyncNgInvent = () => {
-  const tableRef = useRef()
-  const navigate = useNavigate()
+  const tableRef = useRef();
+  const navigate = useNavigate();
+  //form数据
+  const [formData, setFormData] = useState({});
+  const [dataSource, setDataSource] = useState([]);
+  //请求到tabledata
+  const [tableData, settableData] = useState({});
 
-  const [exportLoading, setExportLoading] = useState(false)
   // 分页
   const [formParams, setPostParams] = useState({
-    pageNo: 1,
+    pageNum: 1,
     pageSize: 20,
-  })
+  });
 
-  // const { data, isFetching, refetch, status } = useQueryForm(
-  //   `data-log-audit${formParams.pageNo + formParams.pageSize}`,
-  //   [formParams],
-  //   postInfoLog
-  // );
+  // 搜索
+  const onSearchFn = (obj = {}) => {
+    //   const {params,pages} = obj
+    //   let data = {
+    //     ...params,
+    //     pageNum: pages?.pageNum || 1,
+    //     pageSize: pages?.pageSize || 20
+    //   }
+    //   setFormData({...params})
+    //   console.log('data',data);
+    //   backOrderApi.getOrderListInformation(data).then((res)=>{
+    //     if(res.code === 200 && res.data){
+    //       const data = {
+    //         list: res.data.list,
+    //         pageNum: res.data.pageNum,
+    //         total: res.data.total,
+    //       };
+    //       settableData(data)
+    //       formDataProcessing(data)
+    //       console.log('resData',data);
+    //     }else{
+    //       message.error(res.message)
+    //     }
+    //   })
+    //   .catch(()=>{
+    //   })
+  };
+
+  //分页
   const pageHandlechange = (page) => {
     setPostParams({
       ...formParams,
-      pageNo: page.pageIndex || 1,
+      pageNum: page.pageIndex || 1,
       pageSize: page.pageSize,
-    })
-  }
-  // 搜索
-  const onSearchFn = (params) => {
-    if (!params) {
-      setPostParams({
-        pageNo: 1,
-        pageSize: 20,
-      })
-    } else {
-      let ojb = {
-        ...formParams,
-        ...params,
-        pageNo: 1,
-      }
-      setPostParams(ojb)
-    }
-    setTimeout(() => {
-      refetch()
-    }, 0)
-  }
+    });
+  };
+  const { data, isFetching, refetch, status } = useQueryForm(
+    `data-ordr-list${formParams.pageNo + formParams.pageSize}`,
+    [formParams],
+    backOrderApi.getOrderListInformation,
+  );
 
+  // 处理form数据
+  // const formDataProcessing = (data={})=>{
+  //   const {list} = data
+  //   const dataSource = []
+  //   list.forEach((item,index)=>{
+  //     dataSource?.push(
+  //       {
+  //         number:item.number,
+  //         createDate:item.createDate,
+  //         status:orderState[item.status],
+  //         orderType:item.orderType,
+  //         memberName:item.memberName,
+  //         memberType:item.memberType,
+  //         memberAddress:item.memberAddress,
+  //         memberLinkman:item.memberLinkman,
+  //         memberLinkmanMobile:item.memberLinkmanMobile,
+  //         quantity:item.orderProductList?.length && item.orderProductList[0].quantity,
+  //         freightPrice:item.freightPrice,
+  //         lineAmount: item.orderProductList?.length && item.orderProductList[0].lineAmount,
+  //         id:item.id,
+  //       }
+  //     )
+  //   })
+  //   setDataSource([...dataSource])
+  // }
+  // useEffect(()=>{
+  //   onSearchFn()
+  // },[])
   const tableCallback = async (type, record) => {
-    const { id, operationType } = record
-    if (record.type === 1) {
-      navigate(`/bp-data-audit-detail`, {
-        push: true,
-        state: {
-          approvalId: id,
-          type: operationType,
-        },
-      })
-    } else {
-      navigate(`/data-audit-detail`, {
-        push: true,
-        state: { approvalId: id, type: operationType },
-      })
-    }
-  }
-  const columns = useMemo(() => getColumns(tableCallback), [])
-  const onSelectionChange = (selection, keys) => {
-    console.log('已经选中的行', selection, keys)
-    // setSelectCount(keys);
-  }
-  const tableProps = {
-    selectionType: 'checkbox',
-    onSelectionChange: onSelectionChange,
-  }
-
-  /**
-   * @params {type}
-   * */
-  const postHandleButton = (type) => {
-    // setExportLoading(true)
-    // postLogExport(formParams).then((res) => {
-    //   ExcelUtils.writeBlobExcelFile(res, `BP/GP审核记录`)
-    //   setExportLoading(false)
-    // })
-  }
-
+    const { id } = record;
+    navigate(`/order/list/details`, {
+      push: true,
+      state: {
+        approvalId: id,
+      },
+    });
+  };
+  const columns = useMemo(() => getColumns(tableCallback), []);
+  const fn = (record) => {
+    return record.id;
+  };
   return (
     <>
       <SearchForm onSearchFn={onSearchFn} />
-      <TableButton postHandleButton={postHandleButton} exportLoading={exportLoading} />
+      <TableButton />
       <TableView
         columnsFields={columns}
-        dataSource={[]}
-        total={0}
         ref={tableRef}
-        rowKey="id"
         bordered={false}
-        // loading={isFetching}
+        rowKey="id"
+        dataSource={data?.data?.list || []}
+        total={data?.data?.total || 0}
+        loading={isFetching}
         pageHandlechange={pageHandlechange}
-        pageIndex={formParams.pageNo}
-        scrollX={1000}
+        pageIndex={tableData.pageNum}
+        scrollX={2000}
       />
     </>
-  )
-}
-export default SyncNgInvent
+  );
+};
+export default SyncNgInvent;
