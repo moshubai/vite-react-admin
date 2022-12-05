@@ -37,32 +37,7 @@ const SyncNgInvent = () => {
   });
 
   // 搜索
-  const onSearchFn = (obj = {}) => {
-    //   const {params,pages} = obj
-    //   let data = {
-    //     ...params,
-    //     pageNum: pages?.pageNum || 1,
-    //     pageSize: pages?.pageSize || 20
-    //   }
-    //   setFormData({...params})
-    //   console.log('data',data);
-    //   backOrderApi.getOrderListInformation(data).then((res)=>{
-    //     if(res.code === 200 && res.data){
-    //       const data = {
-    //         list: res.data.list,
-    //         pageNum: res.data.pageNum,
-    //         total: res.data.total,
-    //       };
-    //       settableData(data)
-    //       formDataProcessing(data)
-    //       console.log('resData',data);
-    //     }else{
-    //       message.error(res.message)
-    //     }
-    //   })
-    //   .catch(()=>{
-    //   })
-  };
+  const onSearchFn = (obj = {}) => {};
 
   //分页
   const pageHandlechange = (page) => {
