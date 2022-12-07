@@ -5,12 +5,11 @@ import { useNavigate } from 'react-router-dom';
 
 import { apiLogin } from '../../api/login';
 import { setCookies } from '../../utils/cookie';
-// import '@/style/view-style/login.scss'
 import style from './index.module.less';
 
 const Login = (props) => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = (values) => {
     setLoading(true);
@@ -23,11 +22,6 @@ const Login = (props) => {
         setTimeout(() => {
           message.success('登录成功!');
           setLoading(false);
-          // notification.open({
-          //   message: '欢迎',
-          //   duration: 2,
-          //   description: '欢迎使用后台管理平台',
-          // });
 
           navigate('/home');
         }, 0);
@@ -49,11 +43,7 @@ const Login = (props) => {
               <Input prefix={<UserOutlined style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="用户名" />
             </Form.Item>
             <Form.Item name="password" rules={[{ required: true, message: '请输入密码!' }]}>
-              <Input
-                prefix={<UnlockOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
-                type="password"
-                placeholder="密码"
-              />
+              <Input prefix={<UnlockOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}  type="password" placeholder="密码"/>
             </Form.Item>
             <Form.Item>
               <Button type="primary" htmlType="submit" className="login-form-button" loading={loading}>
